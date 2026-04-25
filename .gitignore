@@ -1,0 +1,36 @@
+## Visual Studio
+.vs/
+[Bb]in/
+[Oo]bj/
+*.user
+*.userosscache
+*.sln.docstates
+
+## .NET
+.cache/
+.project/
+.settings/
+*.csproj.user
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.patch
+*.diff
+*.orig
+*.rej
+
+## SQLite
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+## Logs
+*.log
+error.log
+
+## OS Files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
