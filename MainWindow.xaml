@@ -6,22 +6,22 @@
     xmlns:local="clr-namespace:ClipVault"
     xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
     mc:Ignorable="d"
-    Title="ClipVault" Height="400" Width="400"
+    Title="ClipVault" Height="400" Width="400" Icon="clipvault.png"
     WindowStyle="None" AllowsTransparency="False" Background="{DynamicResource WindowBg}"
     Topmost="True" ShowInTaskbar="False" WindowStartupLocation="Manual"
     FontFamily="Inter, Segoe UI Variable Display, Segoe UI">
 
     <Window.Resources>
         <ResourceDictionary>
-            <!-- Default Dark Theme -->
-            <SolidColorBrush x:Key="WindowBg" Color="#1E1E1E" />
-            <SolidColorBrush x:Key="ItemBg" Color="#11FFFFFF" />
-            <SolidColorBrush x:Key="TextPrimary" Color="#EEEEEE" />
-            <SolidColorBrush x:Key="TextSecondary" Color="#AAAAAA" />
-            <SolidColorBrush x:Key="AccentColor" Color="#00A2FF" />
-            <SolidColorBrush x:Key="BorderColor" Color="#33FFFFFF" />
-            <SolidColorBrush x:Key="CodeBg" Color="#1E1E1E" />
-            <SolidColorBrush x:Key="CodeText" Color="#D4D4D4" />
+            <!-- Default Light Theme -->
+            <SolidColorBrush x:Key="WindowBg" Color="#F5F5F5" />
+            <SolidColorBrush x:Key="ItemBg" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="TextPrimary" Color="#111111" />
+            <SolidColorBrush x:Key="TextSecondary" Color="#666666" />
+            <SolidColorBrush x:Key="AccentColor" Color="#0078D4" />
+            <SolidColorBrush x:Key="BorderColor" Color="#EEEEEE" />
+            <SolidColorBrush x:Key="CodeBg" Color="#F0F0F0" />
+            <SolidColorBrush x:Key="CodeText" Color="#444444" />
 
             <BooleanToVisibilityConverter x:Key="BoolToVis" />
 
@@ -132,8 +132,11 @@
 
             <!-- Header with Title and Mode Toggle -->
             <Grid Grid.Row="0" Margin="0,0,0,10">
-                <TextBlock Text="Clip Vault" Foreground="{DynamicResource TextPrimary}" FontSize="14" FontWeight="SemiBold"
-                    FontFamily="Segoe UI Variable Display" VerticalAlignment="Center" Opacity="0.9"/>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Image Source="clipvault.png" Width="18" Height="18" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality"/>
+                    <TextBlock Text="Clip Vault" Foreground="{DynamicResource TextPrimary}" FontSize="14" FontWeight="SemiBold"
+                        FontFamily="Segoe UI Variable Display" VerticalAlignment="Center" Opacity="0.9"/>
+                </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Padding="5" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="ThemeToggle_Click">
                         <iconPacks:PackIconLucide Kind="SunMoon" Width="16" Height="16" Foreground="{DynamicResource TextSecondary}"/>
@@ -209,7 +212,7 @@
                         </Setter>
                         <Setter Property="ContextMenu">
                             <Setter.Value>
-                                <ContextMenu>
+                                <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
                                     <MenuItem Header="Copy Content" Click="Copy_Click">
                                         <MenuItem.Icon>
                                             <iconPacks:PackIconLucide Kind="Copy" Width="14" />
@@ -226,8 +229,8 @@
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="ListBoxItem">
-                                    <Border x:Name="Bg" Background="{DynamicResource ItemBg}" CornerRadius="6"
-                                        BorderThickness="1" BorderBrush="Transparent" Padding="8,4">
+                                    <Border x:Name="Bg" Background="{DynamicResource ItemBg}" CornerRadius="10"
+                                        BorderThickness="1" BorderBrush="Transparent" Padding="14,12">
                                         <Grid>
                                             <ContentPresenter />
                                         </Grid>
@@ -246,7 +249,7 @@
                                                         <ThicknessAnimation
                                                             Storyboard.TargetName="Bg"
                                                             Storyboard.TargetProperty="Padding"
-                                                            To="10,4,6,4" Duration="0:0:0.2" />
+                                                            To="18,12,10,12" Duration="0:0:0.2" />
                                                     </Storyboard>
                                                 </BeginStoryboard>
                                             </Trigger.EnterActions>
@@ -256,17 +259,15 @@
                                                         <ThicknessAnimation
                                                             Storyboard.TargetName="Bg"
                                                             Storyboard.TargetProperty="Padding"
-                                                            To="8,4" Duration="0:0:0.1" />
+                                                            To="14,12" Duration="0:0:0.1" />
                                                     </Storyboard>
                                                 </BeginStoryboard>
                                             </Trigger.ExitActions>
                                         </Trigger>
                                         <Trigger Property="IsSelected" Value="True">
-                                            <Setter TargetName="Bg" Property="BorderBrush"
-                                                Value="{DynamicResource AccentColor}" />
-                                            <Setter TargetName="Bg" Property="Background"
-                                                Value="{DynamicResource AccentColor}" />
-                                            <Setter TargetName="Bg" Property="Opacity" Value="0.1"/>
+                                            <Setter TargetName="Bg" Property="Background" Value="{DynamicResource AccentColor}" />
+                                            <Setter TargetName="Bg" Property="BorderBrush" Value="{DynamicResource AccentColor}" />
+                                            <Setter Property="Foreground" Value="Black" />
                                         </Trigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
@@ -286,7 +287,7 @@
 
                              <!-- Text Content -->
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding Preview}" TextWrapping="Wrap"
+                                <TextBlock x:Name="ContentText" Text="{Binding Preview}" TextWrapping="Wrap"
                                     MaxHeight="40"
                                     FontSize="13" FontWeight="SemiBold">
                                     <TextBlock.Style>
@@ -303,6 +304,10 @@
                                                     <Setter Property="FontFamily"
                                                         Value="Consolas, Cascadia Code" />
                                                     <Setter Property="Background" Value="{DynamicResource CodeBg}" />
+                                                </DataTrigger>
+                                                <!-- Click Effect: Force Black text when selected -->
+                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
+                                                    <Setter Property="Foreground" Value="Black" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>

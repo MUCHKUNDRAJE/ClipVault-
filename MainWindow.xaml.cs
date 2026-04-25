@@ -94,10 +94,30 @@ namespace ClipVault
         {
             _notifyIcon = new NotifyIcon
             {
-                Icon = System.Drawing.SystemIcons.Information,
                 Visible = true,
                 Text = "ClipVault - Left Click to Open, Right Click for Menu"
             };
+
+            try
+            {
+                string iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "clipvault.png");
+                if (File.Exists(iconPath))
+                {
+                    using (var bitmap = new System.Drawing.Bitmap(iconPath))
+                    {
+                        IntPtr hIcon = bitmap.GetHicon();
+                        _notifyIcon.Icon = System.Drawing.Icon.FromHandle(hIcon);
+                    }
+                }
+                else
+                {
+                    _notifyIcon.Icon = System.Drawing.SystemIcons.Information;
+                }
+            }
+            catch
+            {
+                _notifyIcon.Icon = System.Drawing.SystemIcons.Information;
+            }
 
             // Use MouseClick to distinguish between Left and Right click
             _notifyIcon.MouseClick += (s, e) => 
@@ -156,7 +176,13 @@ namespace ClipVault
 
         private void Copy_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is System.Windows.Controls.MenuItem mi && mi.DataContext is ClipModel clip)
+            ClipModel clip = null;
+            if (sender is FrameworkElement fe && fe.DataContext is ClipModel c)
+                clip = c;
+            else if (ClipsList.SelectedItem is ClipModel sc)
+                clip = sc;
+
+            if (clip != null)
             {
                 if (clip.Type == "IMAGE" && File.Exists(clip.Content))
                 {
@@ -167,16 +193,28 @@ namespace ClipVault
                 {
                     Clipboard.SetText(clip.Content);
                 }
-                _notifyIcon.ShowBalloonTip(1000, "Copied", "Content copied to clipboard", ToolTipIcon.Info);
+                NotificationWindow.Show("Copied", "Content copied to clipboard");
             }
         }
 
         private void Delete_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is System.Windows.Controls.MenuItem mi && mi.DataContext is ClipModel clip)
+            ClipModel clip = null;
+            if (sender is FrameworkElement fe && fe.DataContext is ClipModel c)
+                clip = c;
+            else if (ClipsList.SelectedItem is ClipModel sc)
+                clip = sc;
+
+            if (clip != null)
             {
                 DatabaseHelper.DeleteClip(clip.Id);
-                RefreshClips();
+                
+                // Refresh with current filter
+                string filter = "ALL";
+                if (TabControl.SelectedItem is ListBoxItem item && item.Tag is string t)
+                    filter = t;
+                
+                RefreshClips(filter);
             }
         }
 
@@ -191,27 +229,29 @@ namespace ClipVault
                 this.DragMove();
         }
 
-        private bool _isDark = true;
+        private bool _isDark = false;
         private void ThemeToggle_Click(object sender, RoutedEventArgs e)
         {
             _isDark = !_isDark;
             if (_isDark)
             {
-                Resources["WindowBg"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(30, 30, 30));
-                Resources["ItemBg"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(28, 255, 255, 255));
-                Resources["TextPrimary"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(238, 238, 238));
-                Resources["TextSecondary"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(170, 170, 170));
-                Resources["BorderColor"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(51, 255, 255, 255));
-                Resources["CodeBg"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(30, 30, 30));
+                Resources["WindowBg"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(15, 15, 15));
+                Resources["ItemBg"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(26, 26, 26));
+                Resources["TextPrimary"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(245, 245, 245));
+                Resources["TextSecondary"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(153, 153, 153));
+                Resources["AccentColor"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 162, 255));
+                Resources["BorderColor"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(34, 34, 34));
+                Resources["CodeBg"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(10, 10, 10));
                 Resources["CodeText"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(212, 212, 212));
             }
             else
             {
                 Resources["WindowBg"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(245, 245, 245));
                 Resources["ItemBg"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 255, 255));
-                Resources["TextPrimary"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(51, 51, 51));
+                Resources["TextPrimary"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(17, 17, 17));
                 Resources["TextSecondary"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(102, 102, 102));
-                Resources["BorderColor"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(30, 0, 0, 0));
+                Resources["AccentColor"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 120, 212));
+                Resources["BorderColor"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(238, 238, 238));
                 Resources["CodeBg"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(240, 240, 240));
                 Resources["CodeText"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(68, 68, 68));
             }
@@ -227,7 +267,9 @@ namespace ClipVault
 
             if (element is ListBoxItem item)
             {
+                ClipsList.SelectedItem = item.DataContext; // Explicitly set selection
                 item.IsSelected = true;
+                
                 if (item.ContextMenu != null)
                 {
                     item.ContextMenu.PlacementTarget = item;
@@ -320,7 +362,7 @@ namespace ClipVault
             }
 
             DatabaseHelper.InsertOrUpdateClip(filePath, "IMAGE", "Image copied ");
-            _notifyIcon.ShowBalloonTip(2000, "Image Saved", "An image has been added to ClipVault 🖼️", ToolTipIcon.Info);
+            NotificationWindow.Show("Image Saved", "An image has been added to ClipVault 🖼️");
             RefreshClips();
         }
 
@@ -334,7 +376,7 @@ namespace ClipVault
             string preview = text.Length > 80 ? text.Substring(0, 77) + "..." : text;
 
             DatabaseHelper.InsertOrUpdateClip(text, category, preview);
-            _notifyIcon.ShowBalloonTip(2000, $"{category} Copied", preview, ToolTipIcon.Info);
+            NotificationWindow.Show($"{category} Copied", preview);
             RefreshClips();
         }
 

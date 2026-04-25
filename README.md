@@ -4,6 +4,8 @@
 
 ![ClipVault Header](https://via.placeholder.com/800x200?text=ClipVault+Clipboard+Manager)
 
+![ClipVault Preview](clipvaultfull.png)
+
 ## ✨ Features
 
 - **Automatic Monitoring**: Real-time clipboard tracking that works silently in the background.
