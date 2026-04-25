@@ -2,7 +2,7 @@
 
 **ClipVault** is a modern, high-performance clipboard manager for Windows. It automatically tracks your clipboard history, categorizes content (text, links, code, emails), and stores it securely in a local SQLite database for quick retrieval.
 
-![ClipVault Header](https://via.placeholder.com/800x200?text=ClipVault+Clipboard+Manager)
+
 
 ![ClipVault Preview](clipvaultfull.png)
 
